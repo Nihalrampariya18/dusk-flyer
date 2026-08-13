@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Dusk Flyer &mdash; Flappy Bird-style Game</title>
+
+<!-- Rounded, playful arcade font. Falls back to system fonts if offline. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- Everything gameplay-related lives inside this fixed-aspect-ratio box.
+         The box itself is responsive; the drawing logic inside script.js
+         always thinks in a fixed 400x600 "logical" coordinate space. -->
+    <div class="game-container" id="gameContainer">
+
+      <canvas id="gameCanvas" aria-label="Flappy bird game canvas"></canvas>
+
+      <!-- Live HUD, shown only while actively playing -->
+      <div class="hud hidden" id="hud">
+        <div class="score-pill" id="liveScore">0</div>
+      </div>
+
+      <!-- Mute / unmute toggle, always visible -->
+      <button class="icon-btn" id="muteBtn" aria-label="Mute sound" title="Mute sound">🔊</button>
+
+      <!-- START SCREEN -->
+      <div class="overlay" id="startScreen">
+        <div class="panel">
+          <h1 class="title">Dusk&nbsp;Flyer</h1>
+          <p class="subtitle">A tiny bird, an endless dusk sky.</p>
+
+          <div class="best-row">
+            <span class="best-label">Best</span>
+            <span class="best-value" id="startBest">0</span>
+          </div>
+
+          <button class="primary-btn" id="startBtn">Start Game</button>
+
+          <p class="instructions">Tap&nbsp;/&nbsp;Click&nbsp;/&nbsp;Press&nbsp;Space to Fly</p>
+        </div>
+      </div>
+
+      <!-- GAME OVER SCREEN -->
+      <div class="overlay hidden" id="gameOverScreen">
+        <div class="panel">
+          <h1 class="title over-title">Game Over</h1>
+
+          <div class="stat-row">
+            <div class="stat-box">
+              <span class="stat-label">Score</span>
+              <span class="stat-value" id="finalScore">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Best</span>
+              <span class="stat-value" id="finalBest">0</span>
+            </div>
+          </div>
+
+          <div class="new-best hidden" id="newBestBadge">✨ New Best! ✨</div>
+
+          <button class="primary-btn" id="restartBtn">Play Again</button>
+
+          <p class="instructions">Tap&nbsp;/&nbsp;Click&nbsp;/&nbsp;Press&nbsp;Space to Fly</p>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="footer-note">Built with HTML5 Canvas &amp; vanilla JavaScript &mdash; no external game libraries.</p>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>

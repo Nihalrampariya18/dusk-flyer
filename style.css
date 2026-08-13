@@ -1,0 +1,291 @@
+/* =========================================================================
+   DESIGN TOKENS
+   Change these variables to re-theme the whole game without touching
+   the canvas drawing code (fonts, UI panel colors, buttons).
+   Note: the SKY / PIPE / BIRD / GROUND colors used *inside* the canvas
+   are defined separately in script.js under the CONFIG.colors object,
+   since canvas drawing can't read CSS variables directly.
+   ========================================================================= */
+:root {
+  --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', sans-serif;
+
+  --panel-bg: #fff8ec;
+  --panel-border: #2a1e45;
+  --ink: #2a1e45;
+  --ink-soft: #6b5f8a;
+
+  --accent-coral: #ff6b6b;
+  --accent-coral-dark: #e2504f;
+  --accent-teal: #0ead8c;
+  --accent-gold: #ffc93c;
+
+  --shadow-hard: 0 6px 0 var(--panel-border);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* prevent rubber-band scroll on mobile while playing */
+  background: #1a1130;
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+.page {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* -------------------------------------------------------------------------
+   GAME CONTAINER
+   Fixed 2:3 aspect ratio (400x600 logical units) that scales to fit any
+   screen while staying centered. touch-action:none stops mobile browsers
+   from scrolling/zooming when the player taps to flap.
+   ------------------------------------------------------------------------- */
+.game-container {
+  position: relative;
+  width: min(92vw, 480px);
+  aspect-ratio: 2 / 3;
+  max-height: calc(100vh - 70px);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 6px #14102a,
+    0 20px 50px rgba(0, 0, 0, 0.55);
+  touch-action: none;
+  user-select: none;
+  background: #241748;
+}
+
+canvas#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* -------------------------------------------------------------------------
+   HUD (live score while playing)
+   ------------------------------------------------------------------------- */
+.hud {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.score-pill {
+  background: rgba(255, 255, 255, 0.92);
+  border: 3px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 6px 22px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink);
+  min-width: 56px;
+  text-align: center;
+  box-shadow: var(--shadow-hard);
+}
+
+/* -------------------------------------------------------------------------
+   Mute button
+   ------------------------------------------------------------------------- */
+.icon-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid var(--panel-border);
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--panel-border);
+  transition: transform 0.08s ease;
+}
+.icon-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--panel-border);
+}
+
+/* -------------------------------------------------------------------------
+   Overlays: start screen + game-over screen
+   ------------------------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 12, 40, 0.42);
+  backdrop-filter: blur(1.5px);
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  z-index: 4;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.panel {
+  width: 84%;
+  max-width: 300px;
+  background: var(--panel-bg);
+  border: 4px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 26px 22px 22px;
+  text-align: center;
+  box-shadow: var(--shadow-hard), 0 18px 34px rgba(0, 0, 0, 0.35);
+  animation: pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-in {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--accent-coral-dark);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.08);
+}
+
+.over-title {
+  color: var(--accent-coral-dark);
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.best-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.best-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+}
+.best-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-teal);
+}
+
+.stat-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.stat-box {
+  flex: 1;
+  background: rgba(14, 173, 140, 0.08);
+  border: 2px solid rgba(42, 30, 69, 0.15);
+  border-radius: 12px;
+  padding: 8px 6px;
+}
+.stat-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+.stat-value {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.new-best {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+  animation: pulse 1s ease-in-out infinite;
+}
+.new-best.hidden { display: none; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.primary-btn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent-coral);
+  border: 3px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 12px 26px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--accent-coral-dark);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  width: 100%;
+}
+.primary-btn:hover { filter: brightness(1.04); }
+.primary-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--accent-coral-dark);
+}
+
+.instructions {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.hidden { display: none !important; }
+
+.footer-note {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  text-align: center;
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------------
+   Small screens: trim outer chrome
+   ------------------------------------------------------------------------- */
+@media (max-height: 620px) {
+  .footer-note { display: none; }
+  .game-container { max-height: calc(100vh - 20px); }
+}
